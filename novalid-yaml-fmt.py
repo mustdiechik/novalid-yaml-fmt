@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+""" Simple indent formater """
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-branches
+# pylint: disable=invalid-name
+# https://github.com/mmlb/yamlfmt
+
+import argparse
+import os
+import sys
+import tempfile
+import re
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file', help='file to parse', nargs='*')
+parser.add_argument('-w', '--write', help='overwrite file with output', action='store_true')
+args = parser.parse_args()
+
+DEBUG=False # True / False
+
+def genSpaces(count,isDash):
+    """ Generate string with lenth=count with spaces[+][" -"] """
+    string=""
+    if isDash:
+        count-=2
+    while count>0:
+        string+=" "
+        count-=1
+    if isDash:
+        string+="- "
+    return string
+
+def findLessKey(ar,cursor):
+    """ Find nearest key in dict """
+    while cursor>-1:
+        if cursor==0:
+            return 0
+        if cursor in ar:
+            return ar[cursor]
+        cursor-=1
+
+def round_trip(sout, sin):
+    """ Main processing function """
+    lastCursor=0
+    lastShift=0
+    posDict={0:0}
+    text=""
+    startBlockCursor=False
+    for line in sin.readlines() :
+        if line.strip()=="":
+            text+="\n"
+            continue
+        cursor=re.match(r'^[\ ]*-?[\ ]*',line).end()
+        if startBlockCursor is not False and cursor>startBlockCursor:
+            text+=line
+            continue
+        startBlockCursor=False
+        if re.match(r'^[\ ]*\-{3}',line): # ---
+            text+=line
+            continue
+        if re.match(r'.*\:[\ ]\|[\ ]*$',line): # :| ,
+            startBlockCursor=cursor
+        isDash=False
+        dashAddShift=0
+        if cursor > re.match(r'^[\ ]*',line).end(): # deletect lists (- list)
+            isDash=True
+            dashAddShift=2
+        if isDash and cursor==2:
+            dashAddShift=0
+        if DEBUG:
+            print(">>>>>>>>>>>>>|"+
+                  line+
+                  "isDash="      +str(isDash) +
+                  "\ncursor="    +str(cursor) +
+                  "\nlastShift= "+str(lastShift) +
+                  "\nlastCursor="+str(lastCursor)
+                  )
+        if cursor>lastCursor:
+            if DEBUG:
+                print("gen +shift")
+            line=genSpaces(lastShift+2+dashAddShift,isDash)+line[cursor:].strip()
+            lastCursor=cursor
+            lastShift=lastShift+dashAddShift+2
+            posDict[cursor]=lastShift
+
+        elif cursor<lastCursor:
+            if DEBUG:
+                print("gen -shift")
+            tmpVar=findLessKey(posDict,cursor)
+            line=genSpaces(tmpVar,isDash)+line[cursor:].strip()
+            lastCursor=cursor
+            lastShift=tmpVar
+
+        else: #cursor=lastCursor
+            if DEBUG:
+                print("gen =shift")
+            line=genSpaces(lastShift,isDash)+line[cursor:].strip()
+            lastCursor=cursor
+        text+=line+"\n"
+    if DEBUG:
+        print("############\n\n"+text)
+    else:
+        sout.write(text)
+
+
+def make_temp_file(name):
+    """ Make uniq temp file """
+    basename = os.path.basename(name)
+    dirname = os.path.dirname(name)
+    fd, outname = tempfile.mkstemp(prefix=basename + '.', dir=dirname)
+    stat = os.stat(name)
+    os.fchmod(fd, stat.st_mode)
+    os.fchown(fd, stat.st_uid, stat.st_gid)
+    os.close(fd)
+    return outname
+
+
+def main():
+    """ main """
+    if args.write and not args.file:
+        parser.error('write requires at least one file')
+
+    if not args.file:
+        round_trip(sys.stdout, sys.stdin)
+        sys.exit(0)
+
+    if not args.write:
+        file_out = os.ttyname(sys.stdout.fileno())
+
+    for file in args.file:
+        if args.write:
+            file_out = make_temp_file(file)
+
+        with open(file, 'r', encoding="utf8") as sin, open(file_out, 'w', encoding="utf8") as sout:
+            round_trip(sout, sin)
+
+        if args.write:
+            os.rename(file_out, file)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
