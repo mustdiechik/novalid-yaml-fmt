@@ -9,6 +9,6 @@
   entry: novalid-yaml-fmt.py
   args: [ -w ]
   language: python
-  'types':
+  types:
     - yaml
-    - yaml.gotmpl
+  files: \.(yaml|yaml.gotmpl)$
