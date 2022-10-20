@@ -13,7 +13,7 @@
   types:
     - yaml
     - file
-  files: \.(yaml|yaml.gotmpl)$
+
 
 
 
