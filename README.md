@@ -1,6 +1,8 @@
 # novalid-yaml-fmt
 
-Make pretty format for yaml like files
+Makes pretty format for yaml like files. This script does not check syntasis and validation.
+
+It only analyzes the leftside indents and edits them.
 
 ## Example
 
@@ -56,6 +58,8 @@ sometext: |
                     four
             five
         foo: bar
+
+```
 
 ## Configure pre-commit
 
