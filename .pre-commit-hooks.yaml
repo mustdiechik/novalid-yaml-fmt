@@ -6,13 +6,14 @@
 - id: novalid-yaml-fmt
   name: Format YAML files
   description: Format YAML files
-
   entry: "novalid-yaml-fmt"
   #args: [ -w ]
   language: script
   types:
     - yaml
     - file
+    - text
+
 
 
 
