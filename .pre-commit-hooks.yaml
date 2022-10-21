@@ -9,13 +9,6 @@
   entry: "novalid-yaml-fmt"
   args: [ -w ]
   language: script
+  files: \.(yaml|yaml.gotmpl)$
   types:
-    - yaml
     - file
-    - text
-
-
-
-
-
-
