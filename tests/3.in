@@ -1,0 +1,13 @@
+repoConfig: |
+ ---
+ repos:
+ - id: /.*/
+   allowed_overrides: [workflow]
+   allow_custom_workflows: true
+   apply_requirements: [mergeable]
+ metrics:
+   prometheus:
+     endpoint: /metrics
+
+ingress:
+  enabled: true

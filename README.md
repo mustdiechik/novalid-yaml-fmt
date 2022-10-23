@@ -71,3 +71,7 @@ Add to .pre-commit-config.yaml
     hooks:
       - id: novalid-yaml-fmt
 ```
+## Tests
+```
+bash test.sh
+```
