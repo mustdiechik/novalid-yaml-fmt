@@ -1,0 +1,12 @@
+block:
+    {{ $func }}
+    values:
+      - bases/defaults.yaml.gotmpl
+        {{- range $file := (
+        exec "sh" (list "-c" "echo -n bases/defaults/*.yaml.gotmpl")
+        | splitList " "
+            ) }}
+        {{- if $file }}
+      - {{ $file }}
+        {{- end }}
+        {{- end }}
