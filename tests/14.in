@@ -1,0 +1,13 @@
+---
+- name: Send mail
+  tasks:
+    - name: Example mail
+      community.general.mail:
+        host: smtp.gmail.com #Mention the SMTP hostname here
+        port: 587 #Mention the SMTP port here
+        to: username@gmail.com
+        subject: 'Ansible: System generated mail'
+        body: |
+           This is a system generated mail
+                        from the {{ ansible_facts['hostname'] }} server.
+      delegate_to: localhost

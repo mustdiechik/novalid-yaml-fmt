@@ -1,0 +1,27 @@
+one: x
+two: y
+three: z
+four:
+  - list1
+  - ist2
+  - list3
+foo:
+  five:
+    - list1
+  six:
+    - list1
+    - list2
+    - list3
+  seven:
+    - list4
+    - list5
+  eight:
+    - list1
+    - list2
+    - list3
+    - list4
+  nine:
+    - list1
+    - list2
+    - list3
+    - list4
