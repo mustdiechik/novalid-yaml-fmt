@@ -7,6 +7,6 @@
         to: username@gmail.com
         subject: 'Ansible: System generated mail'
         body: |
-           This is a system generated mail
-           from the {{ ansible_facts['hostname'] }} server.
+          This is a system generated mail
+          from the {{ ansible_facts['hostname'] }} server.
       delegate_to: localhost
