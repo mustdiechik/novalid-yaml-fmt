@@ -15,11 +15,12 @@ one:
                             thee: end
 ---
 sometext: |
+            first
                     ---
                     one
                         two
                             thee
                     four
             five
-        foo: bar
+    foo: bar
 ---
