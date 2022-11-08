@@ -5,6 +5,9 @@ basicAuth:
   foo:
     - one
     - two
+  bar:
+  - one
+  - two
   else:
     one:
             two: two

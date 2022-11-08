@@ -14,6 +14,9 @@ basicAuth:
   foo:
     - one
     - two
+  bar:
+  - one
+  - two
   else:
     one:
             two: two
@@ -22,15 +25,6 @@ basicAuth:
 one:
             two:
                             thee: end
----
-sometext: |
-                    ---
-                    one
-                        two
-                            thee
-                    four
-            five
-        foo: bar
 ```
 ### after:
 
@@ -41,6 +35,9 @@ basicAuth:
   foo:
     - one
     - two
+  bar:
+    - one
+    - two
   else:
     one:
       two: two
@@ -49,16 +46,6 @@ basicAuth:
 one:
   two:
     thee: end
----
-sometext: |
-                    ---
-                    one
-                        two
-                            thee
-                    four
-            five
-        foo: bar
-
 ```
 
 ## Configure pre-commit
@@ -67,7 +54,7 @@ Add to .pre-commit-config.yaml
 
 ```
   - repo: https://github.com/mustdiechik/novalid-yaml-fmt.git
-    rev: v0.0.19
+    rev: v0.0.21
     hooks:
       - id: novalid-yaml-fmt
 ```
