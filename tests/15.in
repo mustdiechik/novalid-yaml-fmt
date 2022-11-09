@@ -1,13 +1,14 @@
 .testSrv:
   stage: deploy
   script:
+    # comment
     - $SSH
     # comment foo
     - $SSH
 
     # comment one
 
-        # comment two
+                    # comment two
     - $SSH
     - $SSH
 xxx: yyy

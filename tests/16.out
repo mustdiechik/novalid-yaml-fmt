@@ -1,0 +1,23 @@
+xxx: zzz
+#comment1
+yyy:
+  #comment
+  #comment
+  - one
+    x: 1
+    # comment
+      # comment
+      # comment
+# comment
+    y: 2
+    #comment2
+  - two
+    x: 3
+    y: 4
+
+#comment3
+zzz: fff
+#comment4
+  #comment5
+  #comment6
+#comment7
