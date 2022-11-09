@@ -51,12 +51,18 @@ def round_trip(sout, sin):
         if line.strip()=="":
             text+="\n"
             continue
+        if re.match(r'^[\ ]*\#',line): # check comment (#)
+            cursor = re.match(r'^[\ ]*\#',line).end() - 1
+            if cursor == lastCursor:
+                tmpVar=lastShift
+            elif cursor > lastCursor:
+                tmpVar=lastShift +2
+            else:
+                tmpVar=cursor
+            text+=genSpaces(tmpVar)+line.strip()+"\n"
+            continue
         if re.match(r'^[\ ]*\-{3}',line): # ---
             text+=line
-            continue
-        if re.match(r'^[\ ]*\#',line): # check comment (#)
-            tmpVar = -2 if isDash else 0
-            text+=genSpaces(lastShift+tmpVar)+line.strip()+"\n"
             continue
         cursor=re.match(r'^[\ ]*-?[\ ]*',line).end()
         if startBlockCursor is not False and cursor>startBlockCursor:
