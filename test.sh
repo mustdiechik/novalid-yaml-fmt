@@ -12,6 +12,6 @@ do
         OUT_FILE=$IN_FILE
     fi
 
-    cat $IN_FILE | ./novalid-yaml-fmt | diff $OUT_FILE -
+    cat $IN_FILE | ./novalid-yaml-fmt | diff -u --horizon-lines=2 $OUT_FILE -
 
 done

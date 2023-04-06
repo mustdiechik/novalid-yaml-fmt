@@ -51,7 +51,7 @@ def round_trip(sout, sin):
         if line.strip()=="":
             text+="\n"
             continue
-        if re.match(r'^[\ ]*\#',line): # check comment (#)
+        if re.match(r'^[\ ]*\#',line): # check comment ( '#')
             cursor = re.match(r'^[\ ]*\#',line).end() - 1
             if cursor == lastCursor:
                 tmpVar=lastShift
