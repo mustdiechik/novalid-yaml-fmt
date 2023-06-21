@@ -45,13 +45,12 @@ def round_trip(sout, sin):
     lastShift=0
     posDict={0:0}
     text=""
-    startBlockCursor=False
     isDash=False
     for line in sin.readlines() :
         if line.strip()=="":
             text+="\n"
             continue
-        if re.match(r'^[\ ]*\#',line): # check comment ( '#')
+        if re.match(r'^[\ ]*\#',line): # check comment ('#')
             cursor = re.match(r'^[\ ]*\#',line).end() - 1
             if cursor == lastCursor:
                 tmpVar=lastShift
@@ -65,15 +64,10 @@ def round_trip(sout, sin):
             text+=line
             continue
         cursor=re.match(r'^[\ ]*-?[\ ]*',line).end()
-        if startBlockCursor is not False and cursor>startBlockCursor:
-            text+=line
-            continue
-        startBlockCursor=False
-        #if re.match(r'.*\:[\ ]\|[\ ]*$',line): # :| ,
-        #    startBlockCursor=cursor
         isDash=False
         dashAddShift=0
-        if cursor > re.match(r'^[\ ]*',line).end(): # deletect lists (- list)
+        firstSymbolPos=re.match(r'^[\ ]*',line).end()
+        if cursor > firstSymbolPos: # deletect lists (- list)
             isDash=True
             dashAddShift=2
         if isDash and cursor==2:
@@ -99,6 +93,7 @@ def round_trip(sout, sin):
             if DEBUG:
                 print("gen -shift")
                 print("tmpVar=" + str(tmpVar))
+                print(posDict)
             line=genSpaces(tmpVar,isDash)+line[cursor:].strip()
             lastCursor=cursor
             lastShift=tmpVar

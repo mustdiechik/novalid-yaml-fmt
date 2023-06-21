@@ -1,6 +1,6 @@
 # novalid-yaml-fmt
 
-Makes pretty format for yaml like files. This script does not check syntaxis and validation.
+Makes pretty format for yaml like files. This script does not check syntax and validation
 
 It only analyzes left side indents and edits them.
 

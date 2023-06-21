@@ -3,16 +3,21 @@ data:
   - host: {{ .Values.ingress.hostname }}
     foo
     bar
+  - zzz:
+    xxx:
+    yyy:
+  {{ if 1 }}
   - xxx:
     for
     bar
 
 
-data:
-  {{- if .Values.ingress.hostname }}
+data2:
+  {{ printf }}
     - host: {{ .Values.ingress.hostname }}
-      foo
-      bar
-    - yyy:
-      for
-      bar
+      foo: 1
+      bar: 2
+  {{ if 2 }}
+    - yyy: 3
+      for: 4
+      bar: 5
