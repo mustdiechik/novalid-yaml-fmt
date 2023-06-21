@@ -54,7 +54,7 @@ Add to .pre-commit-config.yaml
 
 ```
   - repo: https://github.com/mustdiechik/novalid-yaml-fmt.git
-    rev: v0.0.23
+    rev: v0.0.24
     hooks:
       - id: novalid-yaml-fmt
 ```
