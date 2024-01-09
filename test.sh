@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 IFS=""
 IN_FILES=$(find tests/ -type f | grep '\.in$' | sort )
 
@@ -17,4 +17,5 @@ do
 
     cat $IN_FILE | ./novalid-yaml-fmt | diff -u --horizon-lines=2 - $OUT_FILE
 
+    cat $OUT_FILE | ./novalid-yaml-fmt | diff -u --horizon-lines=2 - $OUT_FILE
 done
