@@ -2,7 +2,9 @@
 
 Makes pretty format for yaml like files. This script does not check syntax and validation
 
-It only analyzes left side indents and edits them.
+It only analyzes left side indents and fixes them.
+
+This hook is very useful when working with Helm or Helmfile template files, which used gotemplate.
 
 ## Example
 

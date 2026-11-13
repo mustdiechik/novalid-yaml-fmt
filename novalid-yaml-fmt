@@ -32,12 +32,16 @@ def genSpaces(count,isDash=False):
 
 def findLessKey(ar,cursor):
     """ Find nearest key in dict """
+    result = None
     while cursor>-1:
         if cursor==0:
-            return 0
+            result = 0
+            break
         if cursor in ar:
-            return ar[cursor]
+            result = ar[cursor]
+            break
         cursor-=1
+    return result
 
 def round_trip(sout, sin):
     """ Main processing function """
@@ -60,10 +64,10 @@ def round_trip(sout, sin):
                 tmpVar=cursor
             text+=genSpaces(tmpVar)+line.strip()+"\n"
             continue
-        if re.match(r'^[\ ]*\-{3}',line): # ---
+        if re.match(r'^[\ ]*---',line): # ---
             text+=line
             continue
-        cursor=re.match(r'^[\ ]*-?[\ ]*',line).end()
+        cursor=re.match(r'^[\ ]*(-[\ ]+)?',line).end()
         isDash=False
         dashAddShift=0
         firstSymbolPos=re.match(r'^[\ ]*',line).end()
@@ -73,7 +77,7 @@ def round_trip(sout, sin):
         if isDash and cursor==2:
             dashAddShift=0
         if DEBUG:
-            print(">>>>>>>>>>>>>|"+
+            print(">>>>>>>>>>>>|"+
                   line+
                   "isDash="      +str(isDash) +
                   "\ncursor="    +str(cursor) +
@@ -83,9 +87,12 @@ def round_trip(sout, sin):
         if cursor>lastCursor:
             if DEBUG:
                 print("gen +shift")
-            line=genSpaces(lastShift+2+dashAddShift,isDash)+line[cursor:].strip()
+            current_shift = lastShift + 2 + dashAddShift
+            new_last_shift = lastShift + dashAddShift + 2
+
+            line=genSpaces(current_shift, isDash)+line[cursor:].strip()
             lastCursor=cursor
-            lastShift=lastShift+dashAddShift+2
+            lastShift=new_last_shift
             posDict[cursor]=lastShift
 
         elif cursor<lastCursor:
@@ -109,7 +116,6 @@ def round_trip(sout, sin):
     else:
         sout.write(text)
 
-
 def make_temp_file(name):
     """ Make uniq temp file """
     basename = os.path.basename(name)
@@ -121,12 +127,12 @@ def make_temp_file(name):
     os.close(fd)
     return outname
 
-
 def main():
     """ main """
     if args.write and not args.file:
         parser.error('write requires at least one file')
 
+    file_out = None
     if not args.file:
         round_trip(sys.stdout, sys.stdin)
         sys.exit(0)
@@ -143,7 +149,6 @@ def main():
 
         if args.write:
             os.rename(file_out, file)
-
 
 if __name__ == '__main__':
     sys.exit(main())
