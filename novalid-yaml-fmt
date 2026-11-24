@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Simple indent formater """
+"""Simple indent formater"""
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 # pylint: disable=invalid-name
@@ -7,130 +7,145 @@
 
 import argparse
 import os
+import re
 import sys
 import tempfile
-import re
 
 parser = argparse.ArgumentParser()
-parser.add_argument('file', help='file to parse', nargs='*')
-parser.add_argument('-w', '--write', help='overwrite file with output', action='store_true')
+parser.add_argument("file", help="file to parse", nargs="*")
+parser.add_argument(
+    "-w", "--write", help="overwrite file with output", action="store_true"
+)
 args = parser.parse_args()
 
-DEBUG=False # True / False
+DEBUG = False  # True / False
 
-def genSpaces(count,isDash=False):
-    """ Generate string with lenth=count with spaces[+][" -"] """
-    string=""
+RE_COMMENT = re.compile(r"^[\ ]*\#")
+RE_DASH = re.compile(r"^[\ ]*(-[\ ]+)?")
+RE_DOC_START = re.compile(r"^[\ ]*---")
+RE_LEAD_SPACES = re.compile(r"^[\ ]*")
+
+
+def genSpaces(count, isDash=False):
+    """Generate string with lenth=count with spaces[+][" -"]"""
+    string = ""
     if isDash:
-        count-=2
-    while count>0:
-        string+=" "
-        count-=1
+        count -= 2
+    if count > 0:
+        string = " " * count
     if isDash:
-        string+="- "
+        string += "- "
     return string
 
-def findLessKey(ar,cursor):
-    """ Find nearest key in dict """
+
+def findLessKey(ar, cursor):
+    """Find nearest key in dict"""
     result = None
-    while cursor>-1:
-        if cursor==0:
+    while cursor > -1:
+        if cursor == 0:
             result = 0
             break
         if cursor in ar:
             result = ar[cursor]
             break
-        cursor-=1
+        cursor -= 1
     return result
 
+
 def round_trip(sout, sin):
-    """ Main processing function """
-    lastCursor=0
-    lastShift=0
-    posDict={0:0}
-    text=""
-    isDash=False
-    for line in sin.readlines() :
-        if line.strip()=="":
-            text+="\n"
+    """Main processing function"""
+    lastCursor = 0
+    lastShift = 0
+    posDict = {0: 0}
+    out_lines = []
+    isDash = False
+    for line in sin.readlines():
+        if line.strip() == "":
+            out_lines.append("")
             continue
-        if re.match(r'^[\ ]*\#',line): # check comment ('#')
-            cursor = re.match(r'^[\ ]*\#',line).end() - 1
+        if RE_COMMENT.match(line):  # check comment ('#')
+            cursor = RE_COMMENT.match(line).end() - 1
             if cursor == lastCursor:
-                tmpVar=lastShift
+                tmpVar = lastShift
             elif cursor > lastCursor:
-                tmpVar=lastShift +2
+                tmpVar = lastShift + 2
             else:
-                tmpVar=cursor
-            text+=genSpaces(tmpVar)+line.strip()+"\n"
+                tmpVar = cursor
+            text = genSpaces(tmpVar) + line.strip() + "\n"
+            out_lines.append(text.rstrip("\n"))
             continue
-        if re.match(r'^[\ ]*---',line): # ---
-            text+=line
+        if RE_DOC_START.match(line):  # ---
+            out_lines.append(line.rstrip("\n"))
             continue
-        cursor=re.match(r'^[\ ]*(-[\ ]+)?',line).end()
-        isDash=False
-        dashAddShift=0
-        firstSymbolPos=re.match(r'^[\ ]*',line).end()
-        if cursor > firstSymbolPos: # deletect lists (- list)
-            isDash=True
-            dashAddShift=2
-        if isDash and cursor==2:
-            dashAddShift=0
+        cursor = RE_DASH.match(line).end()
+        isDash = False
+        dashAddShift = 0
+        firstSymbolPos = RE_LEAD_SPACES.match(line).end()
+        if cursor > firstSymbolPos:  # deletect lists (- list)
+            isDash = True
+            dashAddShift = 2
+        if isDash and cursor == 2:
+            dashAddShift = 0
         if DEBUG:
-            print(">>>>>>>>>>>>|"+
-                  line+
-                  "isDash="      +str(isDash) +
-                  "\ncursor="    +str(cursor) +
-                  "\nlastShift= "+str(lastShift) +
-                  "\nlastCursor="+str(lastCursor)
-                  )
-        if cursor>lastCursor:
+            print(
+                f">>>>>>>>>>>>|{line}"
+                f"isDash={isDash}"
+                f"\ncursor={cursor}"
+                f"\nlastShift= {lastShift}"
+                f"\nlastCursor={lastCursor}"
+            )
+        if cursor > lastCursor:
             if DEBUG:
                 print("gen +shift")
             current_shift = lastShift + 2 + dashAddShift
             new_last_shift = lastShift + dashAddShift + 2
 
-            line=genSpaces(current_shift, isDash)+line[cursor:].strip()
-            lastCursor=cursor
-            lastShift=new_last_shift
-            posDict[cursor]=lastShift
+            line = genSpaces(current_shift, isDash) + line[cursor:].strip()
+            lastCursor = cursor
+            lastShift = new_last_shift
+            posDict[cursor] = lastShift
 
-        elif cursor<lastCursor:
-            tmpVar=findLessKey(posDict,cursor)
+        elif cursor < lastCursor:
+            tmpVar = findLessKey(posDict, cursor)
             if DEBUG:
                 print("gen -shift")
-                print("tmpVar=" + str(tmpVar))
+                print(f"tmpVar={tmpVar}")
                 print(posDict)
-            line=genSpaces(tmpVar,isDash)+line[cursor:].strip()
-            lastCursor=cursor
-            lastShift=tmpVar
+            line = genSpaces(tmpVar, isDash) + line[cursor:].strip()
+            lastCursor = cursor
+            lastShift = tmpVar
 
-        else: #cursor=lastCursor
+        else:  # cursor=lastCursor
             if DEBUG:
                 print("gen =shift")
-            line=genSpaces(lastShift,isDash)+line[cursor:].strip()
-            lastCursor=cursor
-        text+=line+"\n"
+            line = genSpaces(lastShift, isDash) + line[cursor:].strip()
+            lastCursor = cursor
+        out_lines.append(line)
+    text = "\n".join(out_lines)
+    if out_lines:
+        text += "\n"
     if DEBUG:
-        print("############\n\n"+text)
+        print("############\n\n" + text)
     else:
         sout.write(text)
 
+
 def make_temp_file(name):
-    """ Make uniq temp file """
+    """Make uniq temp file"""
     basename = os.path.basename(name)
     dirname = os.path.dirname(name)
-    fd, outname = tempfile.mkstemp(prefix=basename + '.', dir=dirname)
+    fd, outname = tempfile.mkstemp(prefix=basename + ".", dir=dirname)
     stat = os.stat(name)
     os.fchmod(fd, stat.st_mode)
     os.fchown(fd, stat.st_uid, stat.st_gid)
     os.close(fd)
     return outname
 
+
 def main():
-    """ main """
+    """main"""
     if args.write and not args.file:
-        parser.error('write requires at least one file')
+        parser.error("write requires at least one file")
 
     file_out = None
     if not args.file:
@@ -138,17 +153,22 @@ def main():
         sys.exit(0)
 
     if not args.write:
-        file_out = os.ttyname(sys.stdout.fileno())
+        file_out = sys.stdout
 
     for file in args.file:
         if args.write:
             file_out = make_temp_file(file)
 
-        with open(file, 'r', encoding="utf8") as sin, open(file_out, 'w', encoding="utf8") as sout:
-            round_trip(sout, sin)
+        with open(file, "r", encoding="utf8") as sin:
+            if args.write:
+                with open(file_out, "w", encoding="utf8") as sout:
+                    round_trip(sout, sin)
+            else:
+                round_trip(sys.stdout, sin)
 
         if args.write:
             os.rename(file_out, file)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())
