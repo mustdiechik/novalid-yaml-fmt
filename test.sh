@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 IFS=""
 IN_FILES=$(find tests/ -type f | grep '\.in$' | sort )
 
@@ -15,7 +15,7 @@ do
         OUT_FILE=$IN_FILE
     fi
 
-    cat $IN_FILE | ./novalid-yaml-fmt | diff -u --horizon-lines=2 - $OUT_FILE
+    ./novalid-yaml-fmt < "$IN_FILE" | diff -u --horizon-lines=2 - "$OUT_FILE"
 
-    cat $OUT_FILE | ./novalid-yaml-fmt | diff -u --horizon-lines=2 - $OUT_FILE
+    ./novalid-yaml-fmt < "$OUT_FILE" | diff -u --horizon-lines=2 - "$OUT_FILE"
 done
